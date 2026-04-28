@@ -1,0 +1,59 @@
+@startuml RailFenceCipher_UseCases
+
+skinparam actorStyle awesome
+skinparam usecaseBorderColor #2E75B6
+skinparam usecaseBackgroundColor #EBF3FB
+skinparam usecaseBorderThickness 2
+skinparam arrowColor #2E75B6
+skinparam actorBorderColor #1F4E79
+skinparam actorBackgroundColor #D6E4F0
+skinparam packageBorderColor #2E75B6
+skinparam packageBackgroundColor #F8FBFF
+skinparam noteBackgroundColor #FFF9C4
+skinparam noteBorderColor #C8A800
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+
+title Диаграмма вариантов использования\nШифр Билайна (Rail Fence Cipher) — Вариант 13
+
+actor "Пользователь" as User
+
+rectangle "Система шифрования Rail Fence" {
+
+    usecase "Ввести исходный текст" as UC1
+    usecase "Задать количество рельсов" as UC2
+    usecase "Зашифровать текст" as UC3
+    usecase "Расшифровать текст" as UC4
+    usecase "Визуализировать\nзаполнение (забор)" as UC5
+    usecase "Скопировать результат\nв буфер обмена" as UC6
+    usecase "Очистить все поля" as UC7
+    usecase "Валидация входных данных" as UC8
+
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+
+UC3 ..> UC8 : <<include>>
+UC4 ..> UC8 : <<include>>
+UC5 ..> UC3 : <<extend>>
+
+note right of UC8
+  Проверяется:
+  • текст не пустой / не null
+  • число рельсов >= 2
+  • число рельсов < длины текста
+end note
+
+note bottom of UC5
+  Отображает матрицу-забор:
+  символы расставлены по рельсам
+  зигзагом, пустые ячейки — "·"
+end note
+
+@enduml
