@@ -1,0 +1,110 @@
+@startuml RailFenceCipher_Classes
+
+skinparam classBackgroundColor #EBF3FB
+skinparam classBorderColor #2E75B6
+skinparam classBorderThickness 2
+skinparam classHeaderBackgroundColor #2E75B6
+skinparam classHeaderFontColor #FFFFFF
+skinparam classHeaderFontSize 13
+skinparam classHeaderFontStyle bold
+skinparam classFontSize 12
+skinparam arrowColor #1F4E79
+skinparam arrowThickness 1.5
+skinparam noteBackgroundColor #FFF9C4
+skinparam noteBorderColor #C8A800
+skinparam defaultFontName Arial
+skinparam packageBorderColor #2E75B6
+skinparam packageBackgroundColor #F0F6FF
+
+title Диаграмма классов — Шифр Билайна (Rail Fence, Вариант 13)
+
+' ─────────────────────────────────────────
+'  Логика шифрования
+' ─────────────────────────────────────────
+package "RailFenceCipher (логика)" {
+
+    class RailFenceCipherLogic <<static>> {
+        + {static} Encrypt(text : string, rails : int) : string
+        + {static} Decrypt(cipher : string, rails : int) : string
+        + {static} BuildFence(text : string, rails : int) : char[][]
+        - {static} GetRowIndices(length : int, rails : int) : int[]
+    }
+
+    note right of RailFenceCipherLogic
+      Исключения:
+      • ArgumentNullException — text == null
+      • ArgumentOutOfRangeException — rails < 2
+    end note
+}
+
+' ─────────────────────────────────────────
+'  GUI
+' ─────────────────────────────────────────
+package "RailFenceCipher (UI)" {
+
+    class Form1 {
+        - txtInput     : TextBox
+        - nudRails     : NumericUpDown
+        - txtResult    : TextBox
+        - rtbFence     : RichTextBox
+        - lblStatus    : Label
+        - RailColors   : Color[]
+        + Form1()
+        - WireEvents() : void
+        - BtnEncrypt_Click(sender, e) : void
+        - BtnDecrypt_Click(sender, e) : void
+        - BtnClear_Click(sender, e) : void
+        - BtnCopy_Click(sender, e) : void
+        - TryGetInput(text, rails) : bool
+        - DrawFence(text : string, rails : int) : void
+        - AppendColored(rtb, text, color, bold) : void
+        - SetStatus(msg : string, isWarning : bool) : void
+        - AttachHoverEffect(btn, hover, normal) : void
+    }
+
+    class Program <<static>> {
+        + {static} Main() : void
+    }
+}
+
+' ─────────────────────────────────────────
+'  Тесты
+' ─────────────────────────────────────────
+package "RailFenceCipher.Tests" {
+
+    class RailFenceTests <<TestClass>> {
+        + Encrypt_TwoRails_ReturnsExpected()
+        + Encrypt_ThreeRails_ReturnsExpected()
+        + Encrypt_FourRails_ReturnsExpected()
+        + EncryptDecrypt_TwoRails_IsReversible()
+        + EncryptDecrypt_ThreeRails_IsReversible()
+        + EncryptDecrypt_FourRails_IsReversible()
+        + Encrypt_EmptyString_ReturnsEmpty()
+        + Decrypt_EmptyString_ReturnsEmpty()
+        + Encrypt_RailsGeLength_ReturnsOriginal()
+        + Encrypt_SingleChar_ReturnsSameChar()
+        + EncryptDecrypt_WithSpacesAndPunctuation_IsReversible()
+        + EncryptDecrypt_Cyrillic_IsReversible()
+        + EncryptDecrypt_MixedCase_IsReversible()
+        + Encrypt_NullText_ThrowsArgumentNullException()
+        + Decrypt_NullText_ThrowsArgumentNullException()
+        + Encrypt_OneRail_ThrowsArgumentOutOfRangeException()
+        + Encrypt_ZeroRails_ThrowsArgumentOutOfRangeException()
+        + Encrypt_NegativeRails_ThrowsArgumentOutOfRangeException()
+        + Decrypt_OneRail_ThrowsArgumentOutOfRangeException()
+        + BuildFence_ReturnsCorrectMatrix()
+        + BuildFence_NullText_ThrowsArgumentNullException()
+        + BuildFence_InvalidRails_ThrowsArgumentOutOfRangeException()
+    }
+}
+
+' ─────────────────────────────────────────
+'  Связи
+' ─────────────────────────────────────────
+Form1        ..>  RailFenceCipherLogic : <<use>>\nEncrypt / Decrypt / BuildFence
+Program      ..>  Form1                : <<create>>
+RailFenceTests ..> RailFenceCipherLogic : <<test>>
+
+Form1 -up-|> Form
+
+@enduml
